@@ -21,9 +21,13 @@ export default function LoginForm({ onLogin }: { onLogin: () => void }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/auth/login", form, {
-        withCredentials: true,
-      });
+      await axios.post(
+        "https://movies-app-backend.onrender.com/auth/login",
+        form,
+        {
+          withCredentials: true,
+        }
+      );
 
       localStorage.setItem("token", "true");
 

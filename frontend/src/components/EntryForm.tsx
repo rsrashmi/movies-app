@@ -1,10 +1,4 @@
-import {
-  Box,
-  Button,
-  MenuItem,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Button, MenuItem, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { createEntry, uploadPoster } from "../services/entry";
 import type { Entry, NewEntry } from "../types/entry";
@@ -34,21 +28,25 @@ export default function EntryForm({ onAdd, editingEntry, onUpdate }: Props) {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-useEffect(() => {
-  if (editingEntry) {
-    setForm({
-      title: editingEntry.title,
-      type: editingEntry.type,
-      director: editingEntry.director,
-      budget: editingEntry.budget,
-      location: editingEntry.location,
-      duration: editingEntry.duration,
-      yearTime: editingEntry.yearTime,
-      poster: editingEntry.poster || "",
-    });
-    setPreviewUrl(editingEntry.poster ? `http://localhost:5000${editingEntry.poster}` : null);
-  }
-}, [editingEntry]);
+  useEffect(() => {
+    if (editingEntry) {
+      setForm({
+        title: editingEntry.title,
+        type: editingEntry.type,
+        director: editingEntry.director,
+        budget: editingEntry.budget,
+        location: editingEntry.location,
+        duration: editingEntry.duration,
+        yearTime: editingEntry.yearTime,
+        poster: editingEntry.poster || "",
+      });
+      setPreviewUrl(
+        editingEntry.poster
+          ? `https://movies-app-backend.onrender.com${editingEntry.poster}`
+          : null
+      );
+    }
+  }, [editingEntry]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -59,47 +57,46 @@ useEffect(() => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setMessage("");
+    e.preventDefault();
+    setMessage("");
 
-  try {
-    let imageUrl = form.poster || "";
-    if (poster) {
-      const upload = await uploadPoster(poster);
-      imageUrl = upload;
+    try {
+      let imageUrl = form.poster || "";
+      if (poster) {
+        const upload = await uploadPoster(poster);
+        imageUrl = upload;
+      }
+
+      const payload: NewEntry = { ...form, poster: imageUrl };
+
+      if (editingEntry && onUpdate) {
+        onUpdate({ ...editingEntry, ...payload });
+        setMessage("✅ Entry updated!");
+      } else {
+        const created = await createEntry(payload);
+        onAdd(created);
+        setMessage("✅ Entry added successfully!");
+      }
+
+      setTimeout(() => {
+        setForm({
+          title: "",
+          type: "Movie",
+          director: "",
+          budget: "",
+          location: "",
+          duration: "",
+          yearTime: "",
+          poster: "",
+        });
+        setPoster(null);
+        setPreviewUrl(null);
+        setMessage("");
+      }, 1500);
+    } catch (err) {
+      setMessage("❌ Failed to submit entry.");
     }
-
-    const payload: NewEntry = { ...form, poster: imageUrl };
-
-    if (editingEntry && onUpdate) {
-       onUpdate({ ...editingEntry, ...payload });
-      setMessage("✅ Entry updated!");
-    } else {
-      const created = await createEntry(payload);
-      onAdd(created);
-      setMessage("✅ Entry added successfully!");
-    }
-
-    setTimeout(() => {
-      setForm({
-        title: "",
-        type: "Movie",
-        director: "",
-        budget: "",
-        location: "",
-        duration: "",
-        yearTime: "",
-        poster: "",
-      });
-      setPoster(null);
-      setPreviewUrl(null);
-      setMessage("");
-    }, 1500);
-  } catch (err) {
-    setMessage("❌ Failed to submit entry.");
-  }
-};
-
+  };
 
   return (
     <Box
@@ -112,43 +109,100 @@ useEffect(() => {
         mb: 5,
       }}
     >
-      <TextField fullWidth label="Title" name="title" value={form.title} onChange={handleChange} required />
-      <TextField fullWidth select label="Type" name="type" value={form.type} onChange={handleChange}>
+      <TextField
+        fullWidth
+        label="Title"
+        name="title"
+        value={form.title}
+        onChange={handleChange}
+        required
+      />
+      <TextField
+        fullWidth
+        select
+        label="Type"
+        name="type"
+        value={form.type}
+        onChange={handleChange}
+      >
         <MenuItem value="Movie">Movie</MenuItem>
         <MenuItem value="TV Show">TV Show</MenuItem>
       </TextField>
-      <TextField fullWidth label="Director" name="director" value={form.director} onChange={handleChange} required />
-      <TextField fullWidth label="Budget" name="budget" value={form.budget} onChange={handleChange} required />
-      <TextField fullWidth label="Location" name="location" value={form.location} onChange={handleChange} required />
-      <TextField fullWidth label="Duration" name="duration" value={form.duration} onChange={handleChange} required />
-      <TextField fullWidth label="Year/Time" name="yearTime" value={form.yearTime} onChange={handleChange} required />
-      
+      <TextField
+        fullWidth
+        label="Director"
+        name="director"
+        value={form.director}
+        onChange={handleChange}
+        required
+      />
+      <TextField
+        fullWidth
+        label="Budget"
+        name="budget"
+        value={form.budget}
+        onChange={handleChange}
+        required
+      />
+      <TextField
+        fullWidth
+        label="Location"
+        name="location"
+        value={form.location}
+        onChange={handleChange}
+        required
+      />
+      <TextField
+        fullWidth
+        label="Duration"
+        name="duration"
+        value={form.duration}
+        onChange={handleChange}
+        required
+      />
+      <TextField
+        fullWidth
+        label="Year/Time"
+        name="yearTime"
+        value={form.yearTime}
+        onChange={handleChange}
+        required
+      />
+
       <Box>
         <Button variant="outlined" component="label">
           Upload Poster
-          <input type="file" hidden accept="image/*" onChange={handleFileChange} />
+          <input
+            type="file"
+            hidden
+            accept="image/*"
+            onChange={handleFileChange}
+          />
         </Button>
         {poster && (
-  <Box mt={1}>
-    <Typography variant="caption">{poster.name}</Typography>
-    {previewUrl && (
-      <Box mt={1}>
-        <img
-          src={previewUrl}
-          alt="Preview"
-          style={{ maxHeight: "120px", borderRadius: "8px", border: "1px solid #ccc" }}
-        />
-      </Box>
-    )}
-  </Box>
-)}
-
+          <Box mt={1}>
+            <Typography variant="caption">{poster.name}</Typography>
+            {previewUrl && (
+              <Box mt={1}>
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  style={{
+                    maxHeight: "120px",
+                    borderRadius: "8px",
+                    border: "1px solid #ccc",
+                  }}
+                />
+              </Box>
+            )}
+          </Box>
+        )}
       </Box>
 
       <Box gridColumn="1 / -1">
         <Button variant="contained" type="submit">
-  {editingEntry ? "Update" : "Add Entry"}
-</Button>
+          {editingEntry ? "Update" : "Add Entry"}
+        </Button>
       </Box>
       {message && <p style={{ marginTop: "10px", color: "gray" }}>{message}</p>}
     </Box>

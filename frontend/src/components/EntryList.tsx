@@ -119,7 +119,7 @@ export default function EntryList({
                 <TableCell>
                   {entry.poster && (
                     <img
-                      src={`http://localhost:5000${entry.poster}`}
+                      src={`https://movies-app-backend.onrender.com${entry.poster}`}
                       alt={entry.title}
                       style={{ height: "60px", borderRadius: "4px" }}
                     />

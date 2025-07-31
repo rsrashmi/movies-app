@@ -2,7 +2,7 @@ import axios from "axios";
 import type { Entry, NewEntry } from "../types/entry";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: "https://movies-app-backend.onrender.com",
   withCredentials: true,
 });
 
