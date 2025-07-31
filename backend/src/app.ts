@@ -7,8 +7,8 @@ import entryRoutes from "./routes/entry.routes";
 import path from "path";
 
 const allowedOrigins = [
-  "http://localhost:5173",
-  // "https://your-frontend.vercel.app",
+  "http://localhost:5173/",
+  "https://movies-app-six-kohl.vercel.app/",
 ];
 
 dotenv.config();
