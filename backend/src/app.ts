@@ -5,13 +5,12 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/auth.routes";
 import entryRoutes from "./routes/entry.routes";
 import path from "path";
+dotenv.config();
 
 const allowedOrigins = [
-  "http://localhost:5173/",
-  "https://movies-app-six-kohl.vercel.app/",
+  process.env.CLIENT_URL,
+  "https://movies-app-six-kohl.vercel.app",
 ];
-
-dotenv.config();
 
 const app = express();
 
