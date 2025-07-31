@@ -7,16 +7,15 @@ import entryRoutes from "./routes/entry.routes";
 import path from "path";
 dotenv.config();
 
-const allowedOrigins = [
-  process.env.CLIENT_URL,
-  "https://movies-app-six-kohl.vercel.app",
-];
-
 const app = express();
 
 app.use(
   cors({
     origin: function (origin, callback) {
+      const allowedOrigins = [
+        "http://localhost:5173",
+        "https://movies-app-six-kohl.vercel.app",
+      ];
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -26,6 +25,8 @@ app.use(
     credentials: true,
   })
 );
+
+app.options("*", cors());
 app.use(express.json());
 app.use(cookieParser());
 
