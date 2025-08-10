@@ -19,11 +19,9 @@ export default function RegisterForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post(
-        "https://movies-app-backend.onrender.com/auth/register",
-        form,
-        { withCredentials: true }
-      );
+      await axios.post("http://localhost:5000/auth/register", form, {
+        withCredentials: true,
+      });
       alert("Registered successfully!");
     } catch (err: any) {
       alert(err.response?.data?.message || "Registration failed");

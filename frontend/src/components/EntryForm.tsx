@@ -2,12 +2,16 @@ import { Box, Button, MenuItem, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { createEntry, uploadPoster } from "../services/entry";
 import type { Entry, NewEntry } from "../types/entry";
+
 type Props = {
   onAdd: (entry: Entry) => void;
   editingEntry?: Entry | null;
   onUpdate?: (entry: Entry) => void;
 };
+
 export default function EntryForm({ onAdd, editingEntry, onUpdate }: Props) {
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const [form, setForm] = useState<NewEntry>({
     title: "",
     type: "Movie",
@@ -21,7 +25,6 @@ export default function EntryForm({ onAdd, editingEntry, onUpdate }: Props) {
 
   const [poster, setPoster] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
   const [message, setMessage] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,13 +43,18 @@ export default function EntryForm({ onAdd, editingEntry, onUpdate }: Props) {
         yearTime: editingEntry.yearTime,
         poster: editingEntry.poster || "",
       });
-      setPreviewUrl(
-        editingEntry.poster
-          ? `https://movies-app-backend.onrender.com${editingEntry.poster}`
-          : null
-      );
+
+      if (editingEntry.poster) {
+        // If the poster already includes http, use it directly
+        const isFullUrl = editingEntry.poster.startsWith("http");
+        setPreviewUrl(
+          isFullUrl ? editingEntry.poster : `${API_URL}${editingEntry.poster}`
+        );
+      } else {
+        setPreviewUrl(null);
+      }
     }
-  }, [editingEntry]);
+  }, [editingEntry, API_URL]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -94,6 +102,7 @@ export default function EntryForm({ onAdd, editingEntry, onUpdate }: Props) {
         setMessage("");
       }, 1500);
     } catch (err) {
+      console.error(err);
       setMessage("❌ Failed to submit entry.");
     }
   };
@@ -179,22 +188,21 @@ export default function EntryForm({ onAdd, editingEntry, onUpdate }: Props) {
             onChange={handleFileChange}
           />
         </Button>
-        {poster && (
+
+        {previewUrl && (
           <Box mt={1}>
-            <Typography variant="caption">{poster.name}</Typography>
-            {previewUrl && (
-              <Box mt={1}>
-                <img
-                  src={previewUrl}
-                  alt="Preview"
-                  style={{
-                    maxHeight: "120px",
-                    borderRadius: "8px",
-                    border: "1px solid #ccc",
-                  }}
-                />
-              </Box>
-            )}
+            {poster && <Typography variant="caption">{poster.name}</Typography>}
+            <Box mt={1}>
+              <img
+                src={previewUrl}
+                alt="Preview"
+                style={{
+                  maxHeight: "120px",
+                  borderRadius: "8px",
+                  border: "1px solid #ccc",
+                }}
+              />
+            </Box>
           </Box>
         )}
       </Box>
@@ -204,6 +212,7 @@ export default function EntryForm({ onAdd, editingEntry, onUpdate }: Props) {
           {editingEntry ? "Update" : "Add Entry"}
         </Button>
       </Box>
+
       {message && <p style={{ marginTop: "10px", color: "gray" }}>{message}</p>}
     </Box>
   );
