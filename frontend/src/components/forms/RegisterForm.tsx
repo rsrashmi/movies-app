@@ -11,6 +11,10 @@ import axios from "axios";
 
 export default function RegisterForm() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -18,13 +22,19 @@ export default function RegisterForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
+
     try {
-      await axios.post("http://localhost:5000/auth/register", form, {
+      await axios.post(`${API_URL}/auth/register`, form, {
         withCredentials: true,
       });
       alert("Registered successfully!");
+      setForm({ name: "", email: "", password: "" });
     } catch (err: any) {
-      alert(err.response?.data?.message || "Registration failed");
+      setError(err.response?.data?.message || "Registration failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -35,12 +45,20 @@ export default function RegisterForm() {
       alignItems="center"
       minHeight="100vh"
       bgcolor="#f5f5f5"
+      px={2}
     >
       <Card sx={{ maxWidth: 400, width: "100%", p: 2 }}>
         <CardContent>
           <Typography variant="h5" mb={2} fontWeight="bold" align="center">
             Create Account
           </Typography>
+
+          {error && (
+            <Typography color="error" variant="body2" mb={1} textAlign="center">
+              {error}
+            </Typography>
+          )}
+
           <form onSubmit={handleSubmit}>
             <TextField
               fullWidth
@@ -77,8 +95,9 @@ export default function RegisterForm() {
               fullWidth
               type="submit"
               sx={{ mt: 2 }}
+              disabled={loading}
             >
-              Register
+              {loading ? "Registering..." : "Register"}
             </Button>
           </form>
         </CardContent>
