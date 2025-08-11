@@ -8,7 +8,7 @@ import path from "path";
 dotenv.config();
 
 const allowedOrigins = [
-  process.env.CLIENT_URL || "http://localhost:5173",
+  process.env.CLIENT_URL ?? "http://localhost:5173",
   "https://movies-app-six-kohl.vercel.app",
   "https://movies-app-git-main-rashmicoders-projects.vercel.app",
 ].filter((origin): origin is string => Boolean(origin));
